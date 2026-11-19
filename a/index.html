@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Aktivasi KasirKu</title>
+<style>
+  :root { --bg:#064e3b; --card:#ffffff; --text:#0f172a; --muted:#475569; --brand:#047857; --soft:#ecfdf5; --line:#d1d5db; }
+  @media (prefers-color-scheme: dark) { :root { --card:#111827; --text:#f1f5f9; --muted:#94a3b8; --soft:#064e3b; --line:#374151; } }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px;
+         background:linear-gradient(135deg,#047857,#064e3b 60%,#022c22); font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--text); }
+  .card { width:100%; max-width:420px; background:var(--card); border-radius:24px; padding:28px; box-shadow:0 20px 50px rgba(0,0,0,.3); }
+  h1 { margin:0 0 6px; font-size:22px; }
+  p { margin:0 0 16px; color:var(--muted); }
+  .btn { display:block; width:100%; text-align:center; padding:15px; border-radius:14px; border:0; font-size:17px; font-weight:600;
+         background:var(--brand); color:#fff; text-decoration:none; cursor:pointer; }
+  .btn.alt { background:transparent; color:var(--brand); border:1.5px solid var(--brand); margin-top:10px; font-size:15px; padding:12px; }
+  .code { margin-top:18px; padding:12px; border-radius:12px; background:var(--soft); font:13px/1.4 ui-monospace,Consolas,monospace; word-break:break-all; }
+  ol { color:var(--muted); padding-left:20px; margin:16px 0 0; font-size:14px; }
+  .err { color:#b91c1c; }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>Aktivasi KasirKu</h1>
+  <p id="msg">Ketuk tombol di bawah untuk membuka KasirKu dan mengaktifkannya.</p>
+  <a id="open" class="btn" href="#">Buka KasirKu &amp; Aktifkan</a>
+  <button id="copy" class="btn alt" type="button">Salin Kode Aktivasi</button>
+  <div id="code" class="code"></div>
+  <ol>
+    <li>Pastikan KasirKu sudah terpasang di HP/tablet ini.</li>
+    <li>Bila tombol tidak membuka aplikasi: salin kode, buka KasirKu, lalu tekan ikon tempel di kolom Kode Aktivasi.</li>
+    <li>Kode hanya berlaku untuk perangkat yang meminta.</li>
+  </ol>
+</main>
+<script>
+  // Kode ada di bagian # link, sehingga tidak pernah terkirim ke server.
+  var k = new URLSearchParams(location.hash.slice(1)).get("k") || "";
+  var open = document.getElementById("open");
+  if (!k) {
+    document.getElementById("msg").innerHTML = '<span class="err">Link aktivasi tidak lengkap. Minta link baru ke pemilik aplikasi.</span>';
+    open.style.display = "none"; document.getElementById("copy").style.display = "none";
+  } else {
+    var enc = encodeURIComponent(k);
+    var isAndroid = /android/i.test(navigator.userAgent);
+    open.href = isAndroid ? "intent://aktivasi?k=" + enc + "#Intent;scheme=kasirku;package=id.kasirku.app;end" : "kasirku://aktivasi?k=" + enc;
+    document.getElementById("code").textContent = k;
+    document.getElementById("copy").onclick = function () {
+      var done = function () { document.getElementById("copy").textContent = "Kode tersalin ✓"; };
+      if (navigator.clipboard) navigator.clipboard.writeText(k).then(done, function () {}); else done();
+    };
+    // Coba buka otomatis (sebagian browser mewajibkan ketukan; tombol tetap tersedia)
+    if (isAndroid) setTimeout(function () { location.href = open.href; }, 400);
+  }
+</script>
+</body>
+</html>
